@@ -1,0 +1,23 @@
+{
+  "name": "crud-ms-with-angular-fe-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "private": "true",
+  "workspaces": [
+    "services/profile-service",
+    "services/address-service",
+    "frontend"
+  ],
+    "scripts": {
+    "lint": "npm -ws run lint",
+    "format": "npm -ws run format",
+    "test": "npm -ws run test",
+    "test:cov": "npm -ws run test:cov",
+    "build": "npm -ws run build"
+  }
+}
