@@ -18,6 +18,9 @@
     "format": "npm -ws run format",
     "test": "npm -ws run test",
     "test:cov": "npm -ws run test:cov",
-    "build": "npm -ws run build"
+    "build": "npm -ws run build",
+    "infra:up": "docker compose --project-directory infra -f infra/docker-compose.yml up -d",
+    "infra:down": "docker compose --project-directory infra -f infra/docker-compose.yml down",
+    "infra:logs": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f"
   }
 }
