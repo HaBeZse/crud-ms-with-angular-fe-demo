@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: student-microservices-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-students}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-students}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  liquibase-profile:
+    image: liquibase/liquibase:4.29
+    container_name: liquibase-profile
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./liquibase/profile:/liquibase/changelog:ro
+    command: >
+      --url=jdbc:postgresql://db:5432/${POSTGRES_DB:-students}
+      --username=${POSTGRES_USER:-postgres}
+      --password=${POSTGRES_PASSWORD:-postgres}
+      --changeLogFile=changelog.xml
+      --search-path=/liquibase/changelog
+      update
+    restart: "no"
+
+  liquibase-address:
+    image: liquibase/liquibase:4.29
+    container_name: liquibase-address
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./liquibase/address:/liquibase/changelog:ro
+    command: >
+      --url=jdbc:postgresql://db:5432/${POSTGRES_DB:-students}
+      --username=${POSTGRES_USER:-postgres}
+      --password=${POSTGRES_PASSWORD:-postgres}
+      --changeLogFile=changelog.xml
+      --search-path=/liquibase/changelog
+      update
+    restart: "no"
+
+volumes:
+  postgres_data:
