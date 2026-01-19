@@ -13,7 +13,7 @@
     "services/address-service",
     "frontend"
   ],
-    "scripts": {
+  "scripts": {
     "lint": "npm -ws run lint",
     "format": "npm -ws run format",
     "test": "npm -ws run test",
@@ -21,6 +21,15 @@
     "build": "npm -ws run build",
     "infra:up": "docker compose --project-directory infra -f infra/docker-compose.yml up -d",
     "infra:down": "docker compose --project-directory infra -f infra/docker-compose.yml down",
-    "infra:logs": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f"
+    "infra:logs": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f",
+    "profile:dev": "npm run -w services/profile-service start:dev",
+    "profile:start": "npm run -w services/profile-service start",
+    "address:dev": "npm run -w services/address-service start:dev",
+    "address:start": "npm run -w services/address-service start",
+    "services:dev": "concurrently -n profile,address \"npm run profile:dev\" \"npm run address:dev\"",
+    "services:start": "concurrently -n profile,address \"npm run profile:start\" \"npm run address:start\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

@@ -21,14 +21,17 @@ import {
 import { StudentDto } from './dto/student.dto';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { StudentsService } from './students.service';
 
 @ApiTags('students')
 @Controller('students')
 export class StudentsController {
+  constructor(private readonly studentsService: StudentsService) {}
+
   @Get()
   @ApiOkResponse({ type: StudentDto, isArray: true })
   list(): Promise<StudentDto[]> {
-    throw new NotImplementedException();
+    return this.studentsService.list();
   }
 
   @Post()
@@ -36,7 +39,7 @@ export class StudentsController {
   @ApiBadRequestResponse({ description: 'Validation Error' })
   @ApiConflictResponse({ description: 'Email already exists' })
   create(@Body() dto: CreateStudentDto): Promise<StudentDto> {
-    throw new NotImplementedException();
+    return this.studentsService.create(dto);
   }
 
   @Put(':id')
@@ -48,7 +51,7 @@ export class StudentsController {
     @Param('id') id: string,
     @Body() dto: UpdateStudentDto,
   ): Promise<StudentDto> {
-    throw new NotImplementedException();
+    return this.studentsService.update(id, dto);
   }
 
   @Delete(':id')
@@ -56,6 +59,6 @@ export class StudentsController {
   @ApiNoContentResponse({ description: 'Deleted' })
   @ApiNotFoundResponse({ description: 'Student Not Found' })
   remove(@Param('id') id: string): Promise<void> {
-    throw new NotImplementedException();
+    return this.studentsService.remove(id);
   }
 }
