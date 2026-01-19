@@ -35,7 +35,7 @@ export class StudentsController {
   @ApiCreatedResponse({ type: StudentDto })
   @ApiBadRequestResponse({ description: 'Validation Error' })
   @ApiConflictResponse({ description: 'Email already exists' })
-  create(@Body() dto: CreateStudentDto): Promise<StudentDto[]> {
+  create(@Body() dto: CreateStudentDto): Promise<StudentDto> {
     throw new NotImplementedException();
   }
 
