@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { StudentsModule } from './students/students.module';
+import { ProfileServiceModule } from './profile-service.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(StudentsModule);
+  const app = await NestFactory.create(ProfileServiceModule);
 
   app.setGlobalPrefix('api');
 
