@@ -17,7 +17,6 @@
     "lint": "npm -ws run lint",
     "format": "npm -ws run format",
     "test": "npm -ws run test",
-    "test:cov": "npm -ws run test:cov",
     "build": "npm -ws run build",
     "infra:up": "docker compose --project-directory infra -f infra/docker-compose.yml up -d",
     "infra:down": "docker compose --project-directory infra -f infra/docker-compose.yml down",
@@ -27,7 +26,10 @@
     "address:dev": "npm run -w services/address-service start:dev",
     "address:start": "npm run -w services/address-service start",
     "services:dev": "concurrently -n profile,address \"npm run profile:dev\" \"npm run address:dev\"",
-    "services:start": "concurrently -n profile,address \"npm run profile:start\" \"npm run address:start\""
+    "services:start": "concurrently -n profile,address \"npm run profile:start\" \"npm run address:start\"",
+    "test:unit": "npm run -w services/profile-service test && npm run -w services/address-service test",
+    "test:e2e": "npm run -w services/profile-service test:e2e && npm run -w services/address-service test:e2e",
+    "test:cov": "npm run -w services/profile-service test:cov && npm run -w services/address-service test:cov"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

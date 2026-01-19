@@ -22,7 +22,7 @@ import { AddressEntity } from './addresses/address.entity';
         schema: 'address',
         entities: [AddressEntity],
         synchronize: false,
-        logging: ['error'],
+        logging: false,
       }),
     }),
     AddressesModule,

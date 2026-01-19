@@ -19,7 +19,7 @@ import {
 import { AddressDto } from './dto/address.dto';
 import { UpsertAddressDto } from './dto/upsert-address.dto';
 import { AddressesService } from './addresses.service';
-import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
+import { BasicAuthGuard } from '../common/guards/basic-auth.guard';
 
 @ApiTags('addresses')
 @ApiBasicAuth()
