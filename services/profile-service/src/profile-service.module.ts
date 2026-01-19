@@ -22,7 +22,7 @@ import { StudentEntity } from './students/student.entity';
         schema: 'profile',
         entities: [StudentEntity],
         synchronize: false,
-        logging: ['error'],
+        logging: false,
       }),
     }),
     StudentsModule,
