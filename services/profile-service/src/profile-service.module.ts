@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StudentsModule } from './students/students.module';
 import { StudentEntity } from './students/student.entity';
+import { HttpLoggingInterceptor } from './common/logging/http-logging.interceptor';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -26,6 +28,20 @@ import { StudentEntity } from './students/student.entity';
       }),
     }),
     StudentsModule,
+  ],
+  providers: [
+    {
+      provide: HttpLoggingInterceptor,
+      useFactory: (cfg: ConfigService) =>
+        new HttpLoggingInterceptor(cfg.get('SERVICE_NAME', 'profile-service')),
+      inject: [ConfigService],
+    },
+    {
+      provide: AllExceptionsFilter,
+      useFactory: (cfg: ConfigService) =>
+        new AllExceptionsFilter(cfg.get('SERVICE_NAME', 'profile-service')),
+      inject: [ConfigService],
+    },
   ],
 })
 export class ProfileServiceModule {}

@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  NotImplementedException,
   Param,
   Post,
   Put,
@@ -22,6 +21,7 @@ import { StudentDto } from './dto/student.dto';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentsService } from './students.service';
+import { ErrorResponseDto } from 'src/common/dto/error-response.dto';
 
 @ApiTags('students')
 @Controller('students')
@@ -36,17 +36,32 @@ export class StudentsController {
 
   @Post()
   @ApiCreatedResponse({ type: StudentDto })
-  @ApiBadRequestResponse({ description: 'Validation Error' })
-  @ApiConflictResponse({ description: 'Email already exists' })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ErrorResponseDto,
+  })
+  @ApiConflictResponse({
+    description: 'Email already exists',
+    type: ErrorResponseDto,
+  })
   create(@Body() dto: CreateStudentDto): Promise<StudentDto> {
     return this.studentsService.create(dto);
   }
 
   @Put(':id')
   @ApiOkResponse({ type: StudentDto })
-  @ApiBadRequestResponse({ description: 'Validation Error' })
-  @ApiNotFoundResponse({ description: 'Student Not Found' })
-  @ApiConflictResponse({ description: 'Email already exists' })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ErrorResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Student Not Found',
+    type: ErrorResponseDto,
+  })
+  @ApiConflictResponse({
+    description: 'Email already exists',
+    type: ErrorResponseDto,
+  })
   upsert(
     @Param('id') id: string,
     @Body() dto: UpdateStudentDto,
@@ -57,7 +72,10 @@ export class StudentsController {
   @Delete(':id')
   @HttpCode(204)
   @ApiNoContentResponse({ description: 'Deleted' })
-  @ApiNotFoundResponse({ description: 'Student Not Found' })
+  @ApiNotFoundResponse({
+    description: 'Student Not Found',
+    type: ErrorResponseDto,
+  })
   remove(@Param('id') id: string): Promise<void> {
     return this.studentsService.remove(id);
   }

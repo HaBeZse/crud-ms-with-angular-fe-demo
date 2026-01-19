@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AddressesModule } from './addresses/addresses.module';
 import { AddressEntity } from './addresses/address.entity';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { HttpLoggingInterceptor } from './common/logging/http-logging.interceptor';
 
 @Module({
   imports: [
@@ -26,6 +28,20 @@ import { AddressEntity } from './addresses/address.entity';
       }),
     }),
     AddressesModule,
+  ],
+  providers: [
+    {
+      provide: HttpLoggingInterceptor,
+      useFactory: (cfg: ConfigService) =>
+        new HttpLoggingInterceptor(cfg.get('SERVICE_NAME', 'address-service')),
+      inject: [ConfigService],
+    },
+    {
+      provide: AllExceptionsFilter,
+      useFactory: (cfg: ConfigService) =>
+        new AllExceptionsFilter(cfg.get('SERVICE_NAME', 'address-service')),
+      inject: [ConfigService],
+    },
   ],
 })
 export class AddressesServiceModule {}

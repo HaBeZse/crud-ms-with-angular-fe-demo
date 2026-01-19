@@ -1,5 +1,5 @@
-import { StudentsController } from 'src/students/students.controller';
-import { StudentsService } from 'src/students/students.service';
+import { StudentsController } from '../../src/students/students.controller';
+import { StudentsService } from '../../src/students/students.service';
 
 describe('StudentsController', () => {
   let controller: StudentsController;
@@ -16,7 +16,7 @@ describe('StudentsController', () => {
     controller = new StudentsController(service);
   });
 
-  it('list() delegates to service.list()', async () => {
+  it('list() -> delegates to service.list()', async () => {
     service.list.mockResolvedValue([
       { id: '1', name: 'A', email: 'a@example.com' } as any,
     ]);
@@ -27,7 +27,7 @@ describe('StudentsController', () => {
     expect(res).toEqual([{ id: '1', name: 'A', email: 'a@example.com' }]);
   });
 
-  it('create() delegates to service.create(dto)', async () => {
+  it('create() -> delegates to service.create(dto)', async () => {
     service.create.mockResolvedValue({ id: '1' } as any);
 
     const dto = { name: 'A', email: 'a@example.com' } as any;
@@ -37,7 +37,7 @@ describe('StudentsController', () => {
     expect(res).toEqual({ id: '1' });
   });
 
-  it('upsert() delegates to service.update(id, dto)', async () => {
+  it('upsert() -> delegates to service.update(id, dto)', async () => {
     service.update.mockResolvedValue({ id: 'x' } as any);
 
     const dto = { name: 'B', email: 'b@example.com' } as any;
@@ -47,7 +47,7 @@ describe('StudentsController', () => {
     expect(res).toEqual({ id: 'x' });
   });
 
-  it('remove() delegates to service.remove(id)', async () => {
+  it('remove() -> delegates to service.remove(id)', async () => {
     service.remove.mockResolvedValue(undefined);
 
     await controller.remove('x');
