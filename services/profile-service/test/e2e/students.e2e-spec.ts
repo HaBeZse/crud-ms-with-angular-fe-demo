@@ -1,10 +1,13 @@
 import { Test } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 
 import { ProfileServiceModule } from 'src/profile-service.module';
+import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
+import { HttpLoggingInterceptor } from 'src/common/logging/http-logging.interceptor';
+import { requestIdMiddleware } from 'src/common/middleware/request-id.middleware';
 
 describe('Profile Service (e2e) /students', () => {
   let app: INestApplication;
@@ -15,11 +18,17 @@ describe('Profile Service (e2e) /students', () => {
       imports: [ProfileServiceModule],
     }).compile();
 
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+
     app = moduleRef.createNestApplication();
     app.setGlobalPrefix('api');
+    app.use(requestIdMiddleware);
     app.useGlobalPipes(
       new ValidationPipe({ whitelist: true, transform: true }),
     );
+    app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
+    app.useGlobalFilters(app.get(AllExceptionsFilter));
 
     await app.init();
 
@@ -32,6 +41,8 @@ describe('Profile Service (e2e) /students', () => {
 
   afterAll(async () => {
     await app.close();
+    (Logger.prototype.log as any).mockRestore?.();
+    (Logger.prototype.error as any).mockRestore?.();
   });
 
   it('GET /api/students -> 200 []', async () => {
@@ -111,5 +122,32 @@ describe('Profile Service (e2e) /students', () => {
     await request(app.getHttpServer())
       .delete(`/api/students/${id}`)
       .expect(404);
+  });
+
+  it('GET /api/students echoes x-request-id', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/students')
+      .set('x-request-id', 'demo-123')
+      .expect(200);
+
+    expect(res.headers['x-request-id']).toBe('demo-123');
+  });
+
+  it('POST invalid returns ErrorResponseDto shape', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/students')
+      .send({ name: 'Bad', email: 'not-an-email' })
+      .expect(400);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        statusCode: 400,
+        error: 'Bad Request',
+        path: '/api/students',
+        timestamp: expect.any(String),
+        requestId: expect.any(String),
+        message: expect.any(Array),
+      }),
+    );
   });
 });

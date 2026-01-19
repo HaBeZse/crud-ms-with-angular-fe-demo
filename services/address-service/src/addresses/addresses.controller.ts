@@ -1,25 +1,26 @@
 import {
+  Body,
   Controller,
   Get,
-  NotImplementedException,
-  Body,
-  Put,
   Param,
   ParseUUIDPipe,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiBasicAuth,
+  ApiOkResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { AddressDto } from './dto/address.dto';
 import { UpsertAddressDto } from './dto/upsert-address.dto';
 import { AddressesService } from './addresses.service';
-import { BasicAuthGuard } from '../common/guards/basic-auth.guard';
+import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
+import { ErrorResponseDto } from 'src/common/dto/error-response.dto';
 
 @ApiTags('addresses')
 @ApiBasicAuth()
@@ -30,8 +31,14 @@ export class AddressesController {
 
   @Get(':studentId')
   @ApiOkResponse({ type: AddressDto })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid Auth' })
-  @ApiNotFoundResponse({ description: 'Address Not Found' })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid Auth',
+    type: ErrorResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Address Not Found',
+    type: ErrorResponseDto,
+  })
   get(
     @Param('studentId', new ParseUUIDPipe({ version: '4' })) studentId: string,
   ): Promise<AddressDto> {
@@ -40,8 +47,18 @@ export class AddressesController {
 
   @Put(':studentId')
   @ApiOkResponse({ type: AddressDto })
-  @ApiBadRequestResponse({ description: 'Validation Error' })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid Auth' })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ErrorResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid Auth',
+    type: ErrorResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Address Not Found',
+    type: ErrorResponseDto,
+  })
   upsert(
     @Param('studentId', new ParseUUIDPipe({ version: '4' })) studentId: string,
     @Body() dto: UpsertAddressDto,

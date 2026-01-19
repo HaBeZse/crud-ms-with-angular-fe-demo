@@ -1,6 +1,5 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { ExecutionContext } from '@nestjs/common';
-import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
+import { UnauthorizedException, ExecutionContext } from '@nestjs/common';
+import { BasicAuthGuard } from '../../src/common/guards/basic-auth.guard';
 
 function ctx(headers: Record<string, any>): ExecutionContext {
   return {
@@ -30,36 +29,36 @@ describe('BasicAuthGuard', () => {
     guard = new BasicAuthGuard(config);
   });
 
-  it('missing header -> 401', () => {
+  it('canActivate() ->missing header -> throws UnauthorizedException (401)', () => {
     expect(() => guard.canActivate(ctx({}))).toThrow(UnauthorizedException);
   });
 
-  it('wrong scheme -> 401', () => {
+  it('canActivate() ->wrong scheme -> throws UnauthorizedException (401)', () => {
     expect(() => guard.canActivate(ctx({ authorization: 'Bearer x' }))).toThrow(
       UnauthorizedException,
     );
   });
 
-  it('basic but no ":" in decoded -> 401', () => {
+  it('canActivate() ->basic but no ":" in decoded -> throws UnauthorizedException (401)', () => {
     const token = Buffer.from('admin', 'utf8').toString('base64');
     expect(() =>
       guard.canActivate(ctx({ authorization: `Basic ${token}` })),
     ).toThrow(UnauthorizedException);
   });
 
-  it('wrong creds -> 401', () => {
+  it('canActivate() ->wrong creds -> throws UnauthorizedException (401)', () => {
     expect(() =>
       guard.canActivate(ctx({ authorization: basic('admin', 'wrong') })),
     ).toThrow(UnauthorizedException);
   });
 
-  it('correct creds -> true', () => {
+  it('canActivate() ->correct creds -> returns true', () => {
     expect(
       guard.canActivate(ctx({ authorization: basic('admin', 'admin') })),
     ).toBe(true);
   });
 
-  it('supports Authorization header casing -> true', () => {
+  it('canActivate() ->supports Authorization header casing -> returns true', () => {
     expect(
       guard.canActivate(ctx({ Authorization: basic('admin', 'admin') })),
     ).toBe(true);

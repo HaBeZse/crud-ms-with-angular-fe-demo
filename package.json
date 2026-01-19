@@ -18,18 +18,34 @@
     "format": "npm -ws run format",
     "test": "npm -ws run test",
     "build": "npm -ws run build",
+
     "infra:up": "docker compose --project-directory infra -f infra/docker-compose.yml up -d",
     "infra:down": "docker compose --project-directory infra -f infra/docker-compose.yml down",
     "infra:logs": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f",
+
     "profile:dev": "npm run -w services/profile-service start:dev",
     "profile:start": "npm run -w services/profile-service start",
     "address:dev": "npm run -w services/address-service start:dev",
     "address:start": "npm run -w services/address-service start",
+
     "services:dev": "concurrently -n profile,address \"npm run profile:dev\" \"npm run address:dev\"",
     "services:start": "concurrently -n profile,address \"npm run profile:start\" \"npm run address:start\"",
+
     "test:unit": "npm run -w services/profile-service test && npm run -w services/address-service test",
     "test:e2e": "npm run -w services/profile-service test:e2e && npm run -w services/address-service test:e2e",
-    "test:cov": "npm run -w services/profile-service test:cov && npm run -w services/address-service test:cov"
+    "test:cov": "npm run -w services/profile-service test:cov && npm run -w services/address-service test:cov",
+
+    "docker:build": "docker compose --project-directory infra -f infra/docker-compose.yml build",
+    "docker:build:profile": "docker compose --project-directory infra -f infra/docker-compose.yml build profile-service",
+    "docker:build:address": "docker compose --project-directory infra -f infra/docker-compose.yml build address-service",
+    "docker:up": "docker compose --project-directory infra -f infra/docker-compose.yml up -d --build",
+    "docker:up:profile": "docker compose --project-directory infra -f infra/docker-compose.yml up -d --build db liquibase-profile profile-service",
+    "docker:up:address": "docker compose --project-directory infra -f infra/docker-compose.yml up -d --build db liquibase-address address-service",
+    "docker:logs": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f",
+    "docker:logs:profile": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f profile-service",
+    "docker:logs:address": "docker compose --project-directory infra -f infra/docker-compose.yml logs -f address-service",
+    "docker:down": "docker compose --project-directory infra -f infra/docker-compose.yml down",
+    "docker:prune": "docker image prune -f"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

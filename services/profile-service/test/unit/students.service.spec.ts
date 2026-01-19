@@ -1,7 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { StudentsService } from 'src/students/students.service';
-import { StudentEntity } from 'src/students/student.entity';
+import { StudentsService } from '../../src/students/students.service';
+import { StudentEntity } from '../../src/students/student.entity';
 
 describe('StudentsService', () => {
   let repo: jest.Mocked<Repository<StudentEntity>>;
@@ -18,7 +18,7 @@ describe('StudentsService', () => {
     service = new StudentsService(repo as any);
   });
 
-  it('list(): calls repo.find with order and maps to DTO', async () => {
+  it('list() -> calls repo.find with order and maps to DTO', async () => {
     repo.find.mockResolvedValue([
       { id: 'id-1', name: 'B', email: 'b@example.com' } as StudentEntity,
     ]);
@@ -29,7 +29,7 @@ describe('StudentsService', () => {
     expect(result).toEqual([{ id: 'id-1', name: 'B', email: 'b@example.com' }]);
   });
 
-  it('create(): trims name, lowercases email, returns DTO', async () => {
+  it('create() -> trims name, lowercases email, returns DTO', async () => {
     repo.save.mockImplementation(async (e: any) => e);
 
     const res = await service.create({
@@ -47,7 +47,7 @@ describe('StudentsService', () => {
     expect(res.id).toBeDefined();
   });
 
-  it('create(): duplicate email -> throws ConflictException (409)', async () => {
+  it('create() -> duplicate email throws ConflictException (409)', async () => {
     repo.save.mockRejectedValue({ driverError: { code: '23505' } });
 
     await expect(
@@ -55,7 +55,7 @@ describe('StudentsService', () => {
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
-  it('update(): non-existing -> throws NotFoundException (404)', async () => {
+  it('update() -> non-existing throws NotFoundException (404)', async () => {
     repo.findOne.mockResolvedValue(null);
 
     await expect(
@@ -66,7 +66,7 @@ describe('StudentsService', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('update(): existing -> saves and returns DTO', async () => {
+  it('update() -> existing saves and returns DTO', async () => {
     repo.findOne.mockResolvedValue({
       id: 'id-1',
       name: 'Old',
@@ -88,7 +88,7 @@ describe('StudentsService', () => {
     });
   });
 
-  it('update(): duplicate email -> throws ConflictException (409)', async () => {
+  it('update() -> duplicate email throws ConflictException (409)', async () => {
     repo.findOne.mockResolvedValue({
       id: 'id-1',
       name: 'A',
@@ -102,7 +102,7 @@ describe('StudentsService', () => {
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
-  it('remove(): affected=0 -> throws NotFoundException (404)', async () => {
+  it('remove() -> affected=0 throws NotFoundException (404)', async () => {
     repo.delete.mockResolvedValue({ affected: 0 } as any);
 
     await expect(service.remove('missing-id')).rejects.toBeInstanceOf(
@@ -110,7 +110,7 @@ describe('StudentsService', () => {
     );
   });
 
-  it('remove(): affected=1 -> resolves void', async () => {
+  it('remove() -> affected=1 resolves void', async () => {
     repo.delete.mockResolvedValue({ affected: 1 } as any);
 
     await expect(service.remove('id-1')).resolves.toBeUndefined();
