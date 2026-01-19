@@ -5,6 +5,8 @@ import {
   Body,
   Put,
   Param,
+  ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,17 +18,24 @@ import {
 } from '@nestjs/swagger';
 import { AddressDto } from './dto/address.dto';
 import { UpsertAddressDto } from './dto/upsert-address.dto';
+import { AddressesService } from './addresses.service';
+import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
 
 @ApiTags('addresses')
 @ApiBasicAuth()
+@UseGuards(BasicAuthGuard)
 @Controller('addresses')
 export class AddressesController {
+  constructor(private readonly addressesService: AddressesService) {}
+
   @Get(':studentId')
   @ApiOkResponse({ type: AddressDto })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid Auth' })
   @ApiNotFoundResponse({ description: 'Address Not Found' })
-  get(@Param('studentId') studentId: string): Promise<AddressDto> {
-    throw new NotImplementedException();
+  get(
+    @Param('studentId', new ParseUUIDPipe({ version: '4' })) studentId: string,
+  ): Promise<AddressDto> {
+    return this.addressesService.get(studentId);
   }
 
   @Put(':studentId')
@@ -34,9 +43,9 @@ export class AddressesController {
   @ApiBadRequestResponse({ description: 'Validation Error' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid Auth' })
   upsert(
-    @Param('studentId') studentId: string,
+    @Param('studentId', new ParseUUIDPipe({ version: '4' })) studentId: string,
     @Body() dto: UpsertAddressDto,
   ): Promise<AddressDto> {
-    throw new NotImplementedException();
+    return this.addressesService.upsert(studentId, dto);
   }
 }
