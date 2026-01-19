@@ -3,6 +3,8 @@ services:
     image: postgres:16-alpine
     container_name: student-microservices-postgres
     restart: unless-stopped
+    env_file:
+      - ../.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -20,6 +22,8 @@ services:
   liquibase-profile:
     image: liquibase/liquibase:4.29
     container_name: liquibase-profile
+    env_file:
+      - ../.env
     depends_on:
       db:
         condition: service_healthy
@@ -37,6 +41,8 @@ services:
   liquibase-address:
     image: liquibase/liquibase:4.29
     container_name: liquibase-address
+    env_file:
+      - ../.env
     depends_on:
       db:
         condition: service_healthy
@@ -50,6 +56,52 @@ services:
       --search-path=/liquibase/changelog
       update
     restart: "no"
+  
+  profile-service:
+    build:
+      context: ..
+      dockerfile: services/profile-service/Dockerfile
+    container_name: profile-service
+    depends_on:
+      liquibase-profile:
+        condition: service_completed_successfully
+    env_file:
+      - ../.env
+    environment:
+      PORT: 3001
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-students}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SERVICE_NAME: profile-service
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  address-service:
+    build:
+      context: ..
+      dockerfile: services/address-service/Dockerfile
+    container_name: address-service
+    depends_on:
+      liquibase-address:
+        condition: service_completed_successfully
+    env_file:
+      - ../.env
+    environment:
+      PORT: 3002
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-students}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SERVICE_NAME: address-service
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-admin}
+      BASIC_AUTH_PASS: ${BASIC_AUTH_PASS:-admin}
+    ports:
+      - "3002:3002"
+    restart: unless-stopped
 
 volumes:
   postgres_data:
